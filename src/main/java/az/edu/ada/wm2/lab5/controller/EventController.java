@@ -98,4 +98,67 @@ public class EventController {
         }
     }
 
+    // 7. FILTER BY DATE RANGE - GET /api/events/filter/date
+    @GetMapping("/filter/date")
+    public ResponseEntity<List<Event>> getEventsByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+        try {
+            List<Event> events = eventService.getEventsByDateRange(start, end);
+            return new ResponseEntity<>(events, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+  // 8. FILTER BY PRICE RANGE - GET /api/events/filter/price
+  @GetMapping("/filter/price")
+  public ResponseEntity<List<Event>> getEventsByPriceRange(
+    @RequestParam BigDecimal min,
+    @RequestParam BigDecimal max) {
+    try {
+      List<Event> events = eventService.getEventsByPriceRange(min, max);
+      return new ResponseEntity<>(events, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // 9. FILTER BY TAG - GET /api/events/filter/tag
+  @GetMapping("/filter/tag")
+  public ResponseEntity<List<Event>> getEventsByTag(@RequestParam String tag) {
+    try {
+      List<Event> events = eventService.getEventsByTag(tag);
+      return new ResponseEntity<>(events, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // 10. UPCOMING EVENTS - GET /api/events/upcoming
+  @GetMapping("/upcoming")
+  public ResponseEntity<List<Event>> getUpcomingEvents() {
+    try {
+      List<Event> events = eventService.getUpcomingEvents();
+      return new ResponseEntity<>(events, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // 11. UPDATE PRICE - PATCH /api/events/{id}/price
+  @PatchMapping("/{id}/price")
+  public ResponseEntity<Event> updateEventPrice(@PathVariable UUID id, @RequestParam BigDecimal price) {
+    try {
+      Event updatedEvent = eventService.updateEventPrice(id, price);
+      return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (RuntimeException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }
